@@ -1,0 +1,34 @@
+volumes:
+  db-volume:
+
+services:
+  db:
+    image: postgres
+    restart: always
+    environment:
+      # Production環境の時は、.envに記載して環境変数で記述する
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      # DATABASE_URL: postgres://username:password@severname:5432/dbname
+      #DATABASE_URL: postgres://postgres:password@db:5432/psgr
+    volumes: 
+      - 'db-volume:/var/lib/postgresql/data'
+
+  web-app:
+    build: .
+    user: rails
+    # working_dir: /product-register
+    working_dir: /rails
+    ports:
+      - '3000:80'
+    volumes:
+      # - '.:/product-register'
+      - '.:/rails'
+    environment:
+      POSTGRES_PASSWORD: password   
+    depends_on:
+      - db
+    links:
+      - db
+    tty: true
+    stdin_open: true 
